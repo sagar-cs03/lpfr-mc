@@ -1,0 +1,100 @@
+## Scenario Settings
+
+# Name for scenario
+Scenario.name = Base-1-Test
+
+# Should we create connections 
+Scenario.simulateConnections = True
+
+# How long to sample the simulation
+Scenario.updateInterval = 1.0
+
+# How long to run the simuation in seconds
+Scenario.endTime = 300
+
+
+
+#### Network Interface settings ###
+
+## Assume they are communicating with bluetooth
+btInterface.type = SimpleBroadcastInterface
+
+# Transmit speed of bluetooth 
+btInterface.transmitSpeed = 250k
+
+# Range of transmission 
+btInterface.transmitRange = 10
+
+
+
+##### Group Settings ####
+
+
+# Mobility model for all the nodes
+Group.movementModel = RandomWaypoint
+
+# Routing protocol to be used by a node in the group
+Group.router = EpidemicRouter
+
+# Buffer size of any node
+Group.bufferSize = 5M
+
+# All nodes have the bluetooth interface
+Group.nrofInterfaces = 1
+Group.interface1 = btInterface
+
+# Walking speeds
+Group.speed = 0.5,1.5
+
+# Message TTL of 300 minutes (5 hours)
+Group.msgTtl = 300
+
+# No. of nodes present in this group
+Group.nrofHosts = 5
+
+# Identifier for the nodes in this group
+Group.groupID = n
+
+#### Motion Patterns ####
+
+# Movement speed
+MovementModel.rngSeed = 1
+
+# Size of the world
+MovementModel.worldSize = 450,350
+
+#### Message Parameters ####
+## Let One be generating the messages
+
+# How many event generators
+Events.nrof = 1
+
+# Class of the first event generator
+Events1.class = MessageEventGenerator
+
+# Creation interval in seconds
+Events1.interval = 25,35
+
+#Message sizes
+Events1.size = 500k,1M
+
+#Number of hosts
+Events1.hosts = 0,4
+
+
+#### Report Settings ####
+
+# How many reports to load
+Report.nrofReports = 1
+
+# Where to create
+Report.reportDir = reports/Lfmr-1-Base
+
+# Report classes to load
+Report.report1 = MessageStatsReport
+
+
+#### Optimization Settings ####
+Optimization.cellSizeMult = 5
+Optimization.randomizeUpdateOrder = true
+
