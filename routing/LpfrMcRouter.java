@@ -82,13 +82,10 @@ public class LpfrMcRouter extends ActiveRouter {
 			
 			DTNHost otherNode = con.getOtherNode(getHost());
 			if(!ipvN.containsKey(otherNode)) {
-				System.out.println("didn't contain" + otherNode.getLocation());
 				ipvN.put(otherNode, WeightMatrix.getDefaultipv());
 				tpmN.put(otherNode, WeightMatrix.getDefaultTPM());
 				tpmNnext.put(otherNode, new double[] {0});
 				mdpN.put(otherNode, new HashMap<String, Double>());
-                                mdpN.get(otherNode).put("Sagar", 4.0);
-                                System.out.println(mdpN.get(otherNode).get("Sagar"));
 			} 
 			
 		}
@@ -284,21 +281,24 @@ public double calculateMDPHost(DTNHost host, double[] weight, String messageId) 
         return null;
     }
     
-    
+  
 	public void algorithmDriver(DTNHost source, DTNHost neighbour, DTNHost destination, String messageId) {
+            if(source == neighbour) {
+                return; 
+            }
 		double[] ps;
 		try {
 			NeighbourInfo neighbourInfo = findAngles(source, neighbour, destination);
+                        if(neighbourInfo.angleBeta > 90) {
+                            return;
+                        }
 			findAreas(neighbourInfo);
 			Area area = neighbourInfo.area;	
 			ps = calculatePredictionToNextStates(neighbour, area.getArea1(), area.getArea2(), area.getTotalArea(), neighbourInfo.angleBeta / 2.0, neighbourInfo.state);
 			updateTpm(neighbour, neighbourInfo.state, ps);
 			calculateTpmNnext(neighbour);
 			calculateTpmSnext();
-                        
-
 			calculateMDP(WeightMatrix.w0, messageId);
-                        System.out.println("hey what's going");
 			calculateMDPHost(neighbour, WeightMatrix.getWeightMatrix(neighbourInfo.state), messageId);
 		} catch(Exception e) {
 			System.out.println("error in algorithm driver");
@@ -355,11 +355,15 @@ public double calculateMDPHost(DTNHost host, double[] weight, String messageId) 
     	double x2 = v2.getX();
     	double y1 = v1.getY();
     	double y2 = v2.getY();
-    	
     	double magnitudeV1 = Math.sqrt( (x1 * x1) + (y1 * y1));
     	double magnitudeV2 = Math.sqrt((x2 * x2) + (y2 * y2));
-   
-    	return Math.toDegrees(Math.acos(((x1 * x2) + (y1 * y2)) / (magnitudeV1 * magnitudeV2))); 	
+        
+        System.out.println("m1 " + magnitudeV1 + "\n" + "m2 " + magnitudeV2 + "\n" + "x1 = " + x1 );
+        System.out.println("x2 " + x2 + "\n" + "y1 " + y1 + "\n" + "y2 = " + y2 );
+        
+    	double anglebeta = Math.toDegrees(Math.acos(((x1 * x2) + (y1 * y2)) / (magnitudeV1 * magnitudeV2))); 	
+        System.out.println("angle beta isss" + anglebeta);
+        return anglebeta;
     }
     
     
@@ -429,7 +433,7 @@ public double calculateMDPHost(DTNHost host, double[] weight, String messageId) 
         for(Connection con : getConnections()) {
             DTNHost other = con.getOtherNode(getHost());
             LpfrMcRouter othRouter = (LpfrMcRouter)other.getRouter();
-            System.out.println("conection between " + this.getHost().getLocation() + "and" + other.getLocation());
+            System.out.println("conection between " + this.getHost() + "and" + other);
             if(othRouter.isTransferring()) {
                 continue;
             }
@@ -443,12 +447,15 @@ public double calculateMDPHost(DTNHost host, double[] weight, String messageId) 
                 algorithmDriver(this.getHost(), other, m.getTo(), m.getId());
                 
                 System.out.println(m.getTo() + "is dest");
-                System.out.println("other router prediction" + mdpN.get(othRouter.getHost()).get(m.getId()));
-                System.out.println("\n my prediction" + this.mdp.get(m.getId()));
-                if(this.mdp.get(m.getId()) < this.mdpN.get(othRouter.getHost()).get(m.getId())) {
-                    // the other node has higher probability of delivery
-                    messages.add(new Tuple<Message, Connection>(m, con));  
+                
+                if(mdpN.get(other).containsKey(m.getId())) {
+                    System.out.println("other router prediction" + mdpN.get(other).get(m.getId()));
+                    System.out.println("\n my prediction" + this.mdp.get(m.getId()));
+                    if(this.mdp.get(m.getId()) < this.mdpN.get(othRouter.getHost()).get(m.getId())) {
+                        messages.add(new Tuple<Message, Connection>(m, con));  
+                    } 
                 }
+                
             }
         }
         if(messages.size() == 0) {
