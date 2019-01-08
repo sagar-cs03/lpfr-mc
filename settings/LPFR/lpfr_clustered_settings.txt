@@ -3,7 +3,7 @@
 #
 
 ## Scenario settings
-Scenario.name = default_scenario
+Scenario.name = Cluster_Movement_Scenario 
 Scenario.simulateConnections = true
 Scenario.updateInterval = 0.1
 # 43k ~= 12h
@@ -21,7 +21,7 @@ Scenario.nrofHostGroups = 4
 
 # common settings for all groups
 Group.movementModel = ClusterMovement
-Group.router = EpidemicRouter
+Group.router = LpfrMcRouter
 Group.bufferSize = 5M
 Group.waitTime = 0, 120
 #All nodes have the firstinterface inteface

@@ -3,7 +3,7 @@
 #
 
 ## Scenario settings
-Scenario.name = default_scenario
+Scenario.name = Combinational_Random_Movement_Scenario
 Scenario.simulateConnections = true
 Scenario.updateInterval = 0.1
 # 43200s == 12h

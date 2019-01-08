@@ -1,7 +1,7 @@
 ## Scenario Settings
 
 # Name for scenario
-Scenario.name = Base-1-Test
+Scenario.name = Simple_Random_Movement_Scenario
 
 # Should we create connections 
 Scenario.simulateConnections = True
@@ -34,7 +34,7 @@ btInterface.transmitRange = 10
 Group.movementModel = RandomWaypoint
 
 # Routing protocol to be used by a node in the group
-Group.router = EpidemicRouter
+Group.router = LpfrMcRouter
 
 # Buffer size of any node
 Group.bufferSize = 5M
