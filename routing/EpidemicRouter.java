@@ -19,7 +19,6 @@ public class EpidemicRouter extends ActiveRouter {
 	 */
 	public EpidemicRouter(Settings s) {
 		super(s);
-		System.out.println("hey stopped");
 		//TODO: read&use epidemic router specific settings (if any)
 	}
 	

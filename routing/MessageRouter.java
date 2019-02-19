@@ -97,6 +97,10 @@ public abstract class MessageRouter {
 	protected int msgTtl;
 	/** Queue mode for sending messages */
 	private int sendQueueMode;
+        
+        public int getQueueMode () {
+            return this.sendQueueMode;
+        }
 
 	/** applications attached to the host */
 	private HashMap<String, Collection<Application>> applications = null;
@@ -655,4 +659,6 @@ public abstract class MessageRouter {
 			this.getHost().toString() + " with " + getNrofMessages() 
 			+ " messages";
 	}
+
+
 }

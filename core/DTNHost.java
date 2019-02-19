@@ -34,6 +34,24 @@ public class DTNHost implements Comparable<DTNHost> {
 	private List<MovementListener> movListeners;
 	private List<NetworkInterface> net;
 	private ModuleCommunicationBus comBus;
+        
+        
+        
+        public String getHostInfo () {
+            StringBuffer hostInfoBuffer = new StringBuffer ();
+            hostInfoBuffer.append(this.location.getX()+","+this.location.getY()+",");
+            if (this.destination == null) {
+                //System.out.println ("This is embarassing");
+                hostInfoBuffer.append("null,null,");
+            } else {
+                hostInfoBuffer.append(this.destination.getX()+","+this.destination.getY());
+            }
+            hostInfoBuffer.append(this.speed+","+this.nextTimeToMove+",");
+            hostInfoBuffer.append(this.router.getBufferSize()+","+this.router.getFreeBufferSize()+",");
+            hostInfoBuffer.append(this.router.getQueueMode ()+",");
+            hostInfoBuffer.append(this.net.get(0).getInterfaceType()+","+this.net.get(0).getTransmitRange()+","+this.net.get(0).getTransmitSpeed());
+            return hostInfoBuffer.toString();
+        }
 
 	static {
 		DTNSim.registerForReset(DTNHost.class.getCanonicalName());

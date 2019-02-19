@@ -25,6 +25,10 @@ import core.Message;
 import core.MessageListener;
 import core.Settings;
 import core.SimClock;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 
 /**
  * Event log panel where log entries are displayed.
@@ -260,18 +264,22 @@ public class EventLogPanel extends JPanel
 	
 	// Implementations of ConnectionListener and MessageListener interfaces
 	public void hostsConnected(DTNHost host1, DTNHost host2) {
+                printToFile (host1.getHostInfo(), host2.getHostInfo(), "connected");
 		processEvent(conUpCheck, "Connection UP", host1, host2, null);
 	}
 
 	public void hostsDisconnected(DTNHost host1, DTNHost host2) {
+                printToFile (host1.getHostInfo(),host2.getHostInfo(),"disconnected");
 		processEvent(conDownCheck, "Connection DOWN", host1, host2, null);
 	}
 
 	public void messageDeleted(Message m, DTNHost where, boolean dropped) {
 		if (!dropped) {
+                        printToFile( where.getHostInfo(),",,,,,,,,,,,","removed");
 			processEvent(msgRemoveCheck, "Message removed", where, null, m);
 		}
 		else {
+                        printToFile( where.getHostInfo(),",,,,,,,,,,,","deleted");
 			processEvent(msgDropCheck, "Message dropped", where, null, m);
 		}
 	}
@@ -279,13 +287,16 @@ public class EventLogPanel extends JPanel
 	public void messageTransferred(Message m, DTNHost from, DTNHost to,
 			boolean firstDelivery) {
 		if (firstDelivery) {
+                        printToFile (from.getHostInfo(),to.getHostInfo(),"delivered");
 			processEvent(msgDeliveredCheck, "Message delivered", from, to, m); 
 		}
 		else if (to == m.getTo()) {
+                        printToFile (from.getHostInfo(),to.getHostInfo(),"delivered");
 			processEvent(msgDeliveredCheck, "Message delivered again", 
 					from, to, m);
 		}
 		else {
+                        printToFile (to.getHostInfo(),to.getHostInfo(),"relayed");
 			processEvent(msgRelayCheck, "Message relayed", from, to, m);
 		}
 	}
@@ -295,17 +306,34 @@ public class EventLogPanel extends JPanel
 	}
 	
 	public void messageTransferAborted(Message m, DTNHost from, DTNHost to) {
+                printToFile (from.getHostInfo(),to.getHostInfo(),"transferAborted");
 		processEvent(msgAbortCheck, "Message relay aborted", from, to, m);
 	}
 	
 	public void messageTransferStarted(Message m, DTNHost from, DTNHost to) {
+                printToFile (from.getHostInfo(),to.getHostInfo(),"relayStarted");
 		processEvent(msgTransferStartCheck,"Message relay started", from,
 				to,m);
 		
 	}
+        
+        public void printToFile (String from, String to, String eventType) {
+            String tmp = from+","+to+","+eventType+"\n";
+            try {
+                File file = new File ("/home/deepakchethan/NetBeansProjects/LPFR-MC/build/classes/dataset.csv");
+                if (!file.exists()) {
+                    file.createNewFile();
+                }
+                FileWriter fw = new FileWriter (file, true);
+                BufferedWriter bw = new BufferedWriter (fw);
+                bw.write(tmp);
+                bw.close();
+            }catch (Exception ioe) {
+                ioe.printStackTrace();
+            }
+        }
 	
 	// end of message interface implementations
-	
 	
 	/**
 	 * Action listener for log entry (host & message) buttons

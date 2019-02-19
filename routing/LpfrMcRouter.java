@@ -20,10 +20,9 @@ public class LpfrMcRouter extends ActiveRouter {
     public static final String LPFR_MC_NS = "LpfrMcRouter" ;                                                                                                                                                                                                                                                                           
 
     //defines initial probability vector for each node
-    private double[] initialProbabilityVector = {0.95, 0.1, 0.1, 0.1, 0.1};
+    private double[] initialProbabilityVector = {0.95, 0.8, 0.73, 0.67, 0.91};
     private double[][] tpm = new double[5][5];
     private double[] tpmSNext = new double[5];
-    
     
     private Map<DTNHost, double[]> ipvN;
     private Map<DTNHost, double[][]> tpmN;
@@ -155,7 +154,6 @@ public double calculateMDPHost(DTNHost host, double[] weight, String messageId) 
     }
 
     public void calculateMDP(double[] weight, String messageId) {
-        System.out.println("hey called calculatemdp");
         double tempMdp = 0.0 ; 
         for(int i = 0; i < 5; i++) tempMdp += weight[i] * tpmSNext[i];
         System.out.println(tempMdp + "is mdp");
@@ -355,15 +353,22 @@ public double calculateMDPHost(DTNHost host, double[] weight, String messageId) 
     	double x2 = v2.getX();
     	double y1 = v1.getY();
     	double y2 = v2.getY();
-    	double magnitudeV1 = Math.sqrt( (x1 * x1) + (y1 * y1));
-    	double magnitudeV2 = Math.sqrt((x2 * x2) + (y2 * y2));
         
-        System.out.println("m1 " + magnitudeV1 + "\n" + "m2 " + magnitudeV2 + "\n" + "x1 = " + x1 );
-        System.out.println("x2 " + x2 + "\n" + "y1 " + y1 + "\n" + "y2 = " + y2 );
+        double dx = x2 - x1;
+        double dy = y2 - y1;
+        double angle = (Math.atan2(dy, dx));
         
-    	double anglebeta = Math.toDegrees(Math.acos(((x1 * x2) + (y1 * y2)) / (magnitudeV1 * magnitudeV2))); 	
-        System.out.println("angle beta isss" + anglebeta);
-        return anglebeta;
+//        if (x1 == x2 && y1 == y2 || x1 == 0 || y1 == 0 || y2 == 0 || x2 == 0 ) return 0;
+//        
+//    	double magnitudeV1 = Math.sqrt( (x1 * x1) + (y1 * y1));
+//    	double magnitudeV2 = Math.sqrt((x2 * x2) + (y2 * y2));
+//        
+//        System.out.println("m1 " + magnitudeV1 + "\n" + "m2 " + magnitudeV2 + "\n" + "x1 = " + x1 );
+//        System.out.println("x2 " + x2 + "\n" + "y1 " + y1 + "\n" + "y2 = " + y2 );
+//        
+//    	double anglebeta = Math.toDegrees(Math.acos(((x1 * x2) + (y1 * y2)) / (magnitudeV1 * magnitudeV2))); 	
+//        System.out.println("angle beta isss" + anglebeta);
+        return Math.toDegrees(angle);
     }
     
     
