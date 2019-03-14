@@ -113,6 +113,7 @@ public class SprayAndWaitRouter extends ActiveRouter {
 	protected Connection tryMessagesToConnections(List<Message> messages,
 			List<Connection> connections) {
 		
+		DTNHost currentHost = this.getHost();
 		String hostName = this.getHost().toString();
 		String neighbourNames = "-";
 		ArrayList<String> neighboursMetaData = new ArrayList<String>();
@@ -129,12 +130,30 @@ public class SprayAndWaitRouter extends ActiveRouter {
 			Connection con = connections.get(i);
 			Message started = tryAllMessages(con, messages); 
 			if (started != null) { 
-				String msgDestination = started.getTo().toString();
-				String selectedNeighbourName = con.getOtherNode(this.getHost()).toString();
+				
+				DTNHost msgDestination = started.getTo();
+				String msgDestinationName = msgDestination.toString();
+				
+				DTNHost selectedNeighbour = con.getOtherNode(this.getHost());
+				String selectedNeighbourName = selectedNeighbour.toString();
+				
 				String timeSinceSimulation = String.valueOf(System.currentTimeMillis() - DTNSim.startTimeOfSimulation);
-				String key = hostName + "-" + msgDestination + "-" + neighbourNames +  "-"  + started.getId() + "-" + selectedNeighbourName + "-" + timeSinceSimulation ;
+				
+				String key = hostName + "-" + msgDestinationName + "-" + neighbourNames +  "-"  + started.getId() + "-" + selectedNeighbourName + "-" + timeSinceSimulation ;
 				System.out.println(key);
-				FilePrinter.printToFileEventData(key, hostName, msgDestination, neighbourNames, started.getId(), selectedNeighbourName);
+				
+				
+				FilePrinter.printToFileEventData(key, hostName, msgDestinationName, neighbourNames, started.getId(), selectedNeighbourName);
+				String _neighbourMetaData = getNeighbourMetaData(neighboursMetaData);
+				
+				FilePrinter.printToFileEventMetaData(
+													  key,
+													  currentHost.getHostInfo(),
+													  msgDestination.getHostInfo(),
+													  _neighbourMetaData,
+													  started.getId(),
+													  selectedNeighbourName
+												  );
 				return con;
 			}		
 		}
@@ -143,6 +162,15 @@ public class SprayAndWaitRouter extends ActiveRouter {
 	}
 	
 	
+	private String getNeighbourMetaData(ArrayList<String> neighboursMetaData) {
+		// TODO Auto-generated method stub
+		String _neighboursMetaData = "";
+		for(int i = 0; i < neighboursMetaData.size(); i++) {
+			_neighboursMetaData += neighboursMetaData.get(i)+",";
+		}
+		return _neighboursMetaData;
+	}
+
 	/**
 	 * Creates and returns a list of messages this router is currently
 	 * carrying and still has copies left to distribute (nrof copies > 1).

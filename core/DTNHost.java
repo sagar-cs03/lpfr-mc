@@ -41,12 +41,6 @@ public class DTNHost implements Comparable<DTNHost> {
             StringBuffer hostInfoBuffer = new StringBuffer ();
             hostInfoBuffer.append(this.toString() + ",");
             hostInfoBuffer.append(this.location.getX()+","+this.location.getY()+",");
-            if (this.destination == null) {
-                //System.out.println ("This is embarassing");
-                hostInfoBuffer.append("null,null,");
-            } else {
-                hostInfoBuffer.append(this.destination.getX()+","+this.destination.getY());
-            }
             hostInfoBuffer.append(this.speed+","+this.nextTimeToMove+",");
             hostInfoBuffer.append(this.router.getBufferSize()+","+this.router.getFreeBufferSize()+",");
             //hostInfoBuffer.append(this.router.getQueueMode ()+",");
