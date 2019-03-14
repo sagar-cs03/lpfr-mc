@@ -27,6 +27,9 @@ public class DTNSim {
 	/** List of class names that should be reset between batch runs */
 	private static List<Class<?>> resetList = new ArrayList<Class<?>>();
 	
+	//starting time of simulation - to be used as the key
+	public static  long startTimeOfSimulation = 0;
+	
 	/**
 	 * Starts the user interface with given arguments.
 	 * If first argument is {@link #BATCH_MODE_FLAG}, the batch mode and text UI
@@ -45,7 +48,7 @@ public class DTNSim {
 		String confFiles[];
 		int firstConfIndex = 0;
 		int guiIndex = 0;
-
+		startTimeOfSimulation = System.currentTimeMillis();
 		/* set US locale to parse decimals in consistent way */
 		java.util.Locale.setDefault(java.util.Locale.US);
 		

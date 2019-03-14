@@ -5,12 +5,15 @@
 package routing;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import core.Connection;
 import core.DTNHost;
 import core.Message;
 import core.Settings;
+import core.DTNSim;
+
 
 /**
  * Implementation of Spray and wait router as depicted in 
@@ -35,7 +38,6 @@ public class SprayAndWaitRouter extends ActiveRouter {
 	public SprayAndWaitRouter(Settings s) {
 		super(s);
 		Settings snwSettings = new Settings(SPRAYANDWAIT_NS);
-		
 		initialNrofCopies = snwSettings.getInt(NROF_COPIES);
 		isBinary = snwSettings.getBoolean( BINARY_MODE);
 	}
@@ -107,6 +109,40 @@ public class SprayAndWaitRouter extends ActiveRouter {
 		}
 	}
 	
+	@Override
+	protected Connection tryMessagesToConnections(List<Message> messages,
+			List<Connection> connections) {
+		
+		String hostName = this.getHost().toString();
+		String neighbourNames = "-";
+		ArrayList<String> neighboursMetaData = new ArrayList<String>();
+		
+		for(int i = 0; i < connections.size(); i++) {
+			DTNHost otherHost =  connections.get(i).getOtherNode(this.getHost());
+			String otherHostName = otherHost.toString();
+			neighbourNames += otherHostName + "-";
+			neighboursMetaData.add(otherHost.getHostInfo());
+		}
+		
+		
+		for (int i=0, n=connections.size(); i<n; i++) {
+			Connection con = connections.get(i);
+			Message started = tryAllMessages(con, messages); 
+			if (started != null) { 
+				String msgDestination = started.getTo().toString();
+				String selectedNeighbourName = con.getOtherNode(this.getHost()).toString();
+				String timeSinceSimulation = String.valueOf(System.currentTimeMillis() - DTNSim.startTimeOfSimulation);
+				String key = hostName + "-" + msgDestination + "-" + neighbourNames +  "-"  + started.getId() + "-" + selectedNeighbourName + "-" + timeSinceSimulation ;
+				System.out.println(key);
+				FilePrinter.printToFileEventData(key, hostName, msgDestination, neighbourNames, started.getId(), selectedNeighbourName);
+				return con;
+			}		
+		}
+		
+		return null;
+	}
+	
+	
 	/**
 	 * Creates and returns a list of messages this router is currently
 	 * carrying and still has copies left to distribute (nrof copies > 1).
@@ -155,6 +191,22 @@ public class SprayAndWaitRouter extends ActiveRouter {
 		}
 		msg.updateProperty(MSG_COUNT_PROPERTY, nrofCopies);
 	}
+	
+	@Override
+	public void changedConnection(Connection con) {
+		
+		// TODO Auto-generated method stub
+		super.changedConnection(con);	
+		if(con.isUp()) {		
+			DTNHost otherNode = con.getOtherNode(getHost());
+			DTNHost currentHost  = this.getHost();
+			String key = currentHost.toString() + "-" + otherNode.toString() + "-" + (System.currentTimeMillis() - DTNSim.startTimeOfSimulation);
+			FilePrinter.printToFileConnectionMetaData(key, currentHost.getHostInfo(), otherNode.getHostInfo());
+			FilePrinter.printToFileConnectionData(key, currentHost.toString(), otherNode.toString(), "connected_up");
+		}
+	}
+	
+
 	
 	@Override
 	public SprayAndWaitRouter replicate() {

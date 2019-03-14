@@ -320,7 +320,7 @@ public class EventLogPanel extends JPanel
         public void printToFile (String from, String to, String eventType) {
             String tmp = from+","+to+","+eventType+"\n";
             try {
-                File file = new File ("/home/deepakchethan/NetBeansProjects/LPFR-MC/build/classes/dataset.csv");
+                File file = new File ("C:\\Users\\i506670\\Projects\\lpfr-mc\\dataset\\dataset_dc.csv");
                 if (!file.exists()) {
                     file.createNewFile();
                 }
