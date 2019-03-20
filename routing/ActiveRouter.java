@@ -17,6 +17,7 @@ import util.Tuple;
 
 import core.Connection;
 import core.DTNHost;
+import core.DTNSim;
 import core.Message;
 import core.MessageListener;
 import core.NetworkInterface;
@@ -316,7 +317,6 @@ public abstract class ActiveRouter extends MessageRouter {
 		makeRoomForMessage(size);
 	}
 
-	
 	/**
 	 * Returns the oldest (by receive time) message in the message buffer 
 	 * (that is not being sent if excludeMsgBeingSent is true).
@@ -464,6 +464,9 @@ public abstract class ActiveRouter extends MessageRouter {
 
 		return tryMessagesToConnections(messages, connections);
 	}
+	
+	
+	
 		
 	/**
 	 * Exchanges deliverable (to final recipient) messages between this host

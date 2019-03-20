@@ -18,6 +18,7 @@ import util.Tuple;
 
 import core.Connection;
 import core.DTNHost;
+import core.DTNSim;
 import core.Message;
 import core.Settings;
 import core.SimClock;
@@ -217,6 +218,17 @@ public class ProphetRouter extends ActiveRouter {
 	
 		Collection<Message> msgCollection = getMessageCollection();
 		
+		List<Connection> connections = getConnections();
+		ArrayList<String> neighboursMetaData = new ArrayList<String>(); 
+		String neighbourNames = "-";
+		for(int i = 0; i < connections.size(); i++) {
+			DTNHost otherHost =  connections.get(i).getOtherNode(this.getHost());
+			String otherHostName = otherHost.toString();
+			neighbourNames += otherHostName + "-";
+			neighboursMetaData.add(otherHost.getHostInfo());
+		}
+		
+		
 		/* for all connected hosts collect all messages that have a higher
 		   probability of delivery by the other host */
 		for (Connection con : getConnections()) {
@@ -232,6 +244,7 @@ public class ProphetRouter extends ActiveRouter {
 					continue; // skip messages that the other one has
 				}
 				if (othRouter.getPredFor(m.getTo()) > getPredFor(m.getTo())) {
+					
 					// the other node has higher probability of delivery
 					messages.add(new Tuple<Message, Connection>(m,con));
 				}
@@ -242,8 +255,95 @@ public class ProphetRouter extends ActiveRouter {
 			return null;
 		}
 		
-		return tryMessagesForConnected(messages);	// try to send messages
+		//return tryMessagesForConnected(messages);	// try to send messages
+		
+		Tuple<Message, Connection> msgWhoseTransferWasStartedToConnection = tryMessagesForConnected(messages);
+		if (msgWhoseTransferWasStartedToConnection != null) {
+			
+			Message msg = msgWhoseTransferWasStartedToConnection.getKey();
+			Connection con = msgWhoseTransferWasStartedToConnection.getValue();
+					
+			String hostName = this.getHost().toString();
+			
+			//message destination name
+			DTNHost msgDestination = msg.getTo();
+			String msgDestinationName = msgDestination.toString();
+			
+			//the selected router name
+			DTNHost selectedNeighbour = con.getOtherNode(this.getHost());
+			String selectedNeighbourName = selectedNeighbour.toString();
+			ProphetRouter selectedRouter = (ProphetRouter)selectedNeighbour.getRouter();
+			
+			//the time since simulation
+			//used in generating key
+			String timeSinceSimulation = String.valueOf(System.currentTimeMillis() - DTNSim.startTimeOfSimulation);
+			
+			//key - self explanatory
+			//extra - prob of this node, prob of the selected router node
+			String key = hostName + "-" + msgDestinationName + "-" + neighbourNames +  "-"  + msg.getId() + "-" + selectedNeighbourName + "-" + timeSinceSimulation ;
+			
+			//myRouter prediction and otherRouter prediction for the given msg
+			String myPrediction = "" + this.getPredFor(msg.getTo()), othRouterPrediction = "" + selectedRouter.getPredFor(msg.getTo());
+			
+
+			//key has extra probs
+			key += "-" + String.valueOf(this.getPredFor(msg.getTo())) + "-" + String.valueOf(selectedRouter.getPredFor(msg.getTo()));
+			
+			
+			
+			//print the info to the file
+			FilePrinter.printToFileEventDataForProphet(key, hostName, msgDestinationName, neighbourNames, msg.getId(), selectedNeighbourName, myPrediction, othRouterPrediction );
+			
+			String _neighbourMetaData = getNeighbourMetaData(neighboursMetaData);
+			
+			FilePrinter.printToFileEventMetaData(key,
+												 this.getHost().getHostInfo(), 
+												 msgDestination.getHostInfo(),
+												 _neighbourMetaData, 
+												 msg.getId(), 
+												 selectedNeighbourName);
+			
+		}
+		return msgWhoseTransferWasStartedToConnection;
+		
 	}
+	
+	
+	private String getNeighbourMetaData(ArrayList<String> neighboursMetaData) {
+		// TODO Auto-generated method stub
+		String _neighboursMetaData = "";
+		for(int i = 0; i < neighboursMetaData.size(); i++) {
+			_neighboursMetaData += neighboursMetaData.get(i)+",";
+		}
+		return _neighboursMetaData;
+	}
+	
+	/**
+	 * Tries to send messages for the connections that are mentioned
+	 * in the Tuples in the order they are in the list until one of
+	 * the connections starts transferring or all tuples have been tried.
+	 * @param tuples The tuples to try
+	 * @return The tuple whose connection accepted the message or null if
+	 * none of the connections accepted the message that was meant for them.
+	 */
+	@Override
+	protected Tuple<Message, Connection> tryMessagesForConnected(
+			List<Tuple<Message, Connection>> tuples) {
+		if (tuples.size() == 0) {
+			return null;
+		}
+		
+		for (Tuple<Message, Connection> t : tuples) {
+			Message m = t.getKey();
+			Connection con = t.getValue();
+			if (startTransfer(m, con) == RCV_OK) {
+				return t;
+			}
+		}
+		
+		return null;
+	}
+	
 	
 	/**
 	 * Comparator for Message-Connection-Tuples that orders the tuples by

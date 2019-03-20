@@ -115,9 +115,16 @@ public class SprayAndWaitRouter extends ActiveRouter {
 		
 		DTNHost currentHost = this.getHost();
 		String hostName = this.getHost().toString();
+		
+		//this contains name of surround nodes separated by "-"
+		//used for creating the key
 		String neighbourNames = "-";
+		
+		//holds surrounding nodes comma separated info
+		//each element is a string that has comma separated info about the surrounding nodes
 		ArrayList<String> neighboursMetaData = new ArrayList<String>();
 		
+		//this just populates the above lists and string variables
 		for(int i = 0; i < connections.size(); i++) {
 			DTNHost otherHost =  connections.get(i).getOtherNode(this.getHost());
 			String otherHostName = otherHost.toString();
@@ -125,26 +132,39 @@ public class SprayAndWaitRouter extends ActiveRouter {
 			neighboursMetaData.add(otherHost.getHostInfo());
 		}
 		
-		
+		//for each connection, try sending all the messages whose copies are left 
+		// in the current node. messages contain messages whose copies are still available
+		// in the current node.
 		for (int i=0, n=connections.size(); i<n; i++) {
 			Connection con = connections.get(i);
 			Message started = tryAllMessages(con, messages); 
 			if (started != null) { 
 				
+				//message destination name
 				DTNHost msgDestination = started.getTo();
 				String msgDestinationName = msgDestination.toString();
 				
+				//the selected router name
 				DTNHost selectedNeighbour = con.getOtherNode(this.getHost());
 				String selectedNeighbourName = selectedNeighbour.toString();
 				
+				//the time since simulation
+				//used in generating key
 				String timeSinceSimulation = String.valueOf(System.currentTimeMillis() - DTNSim.startTimeOfSimulation);
 				
+				//key - self explanatory
 				String key = hostName + "-" + msgDestinationName + "-" + neighbourNames +  "-"  + started.getId() + "-" + selectedNeighbourName + "-" + timeSinceSimulation ;
 				System.out.println(key);
 				
-				
+				//print the event data to file
+				//just contains the name of nodes, not their full info
 				FilePrinter.printToFileEventData(key, hostName, msgDestinationName, neighbourNames, started.getId(), selectedNeighbourName);
+				
+				//generate a string that concatenates the neighbour info's
+				// each neighbour info is comma separated as well
+				// so you have comma separated info of nodes and all these are joined together using commas
 				String _neighbourMetaData = getNeighbourMetaData(neighboursMetaData);
+				
 				
 				FilePrinter.printToFileEventMetaData(
 													  key,

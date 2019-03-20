@@ -4,6 +4,13 @@
  */
 package routing;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import core.Connection;
+import core.DTNHost;
+import core.DTNSim;
+import core.Message;
 import core.Settings;
 
 /**
@@ -47,6 +54,68 @@ public class EpidemicRouter extends ActiveRouter {
 		this.tryAllMessagesToAllConnections();
 	}
 	
+	@Override
+	protected Connection tryMessagesToConnections(List<Message> messages,
+			List<Connection> connections) {
+		
+		DTNHost currentHost = this.getHost();
+		String hostName = this.getHost().toString();
+		String neighbourNames = "-";
+		
+		//each element is a string, containing comma separated info about surrounding nodes
+		ArrayList<String> neighboursMetaData = new ArrayList<String>();
+		
+		for(int i = 0; i < connections.size(); i++) {
+			DTNHost otherHost =  connections.get(i).getOtherNode(this.getHost());
+			String otherHostName = otherHost.toString();
+			neighbourNames += otherHostName + "-";
+			neighboursMetaData.add(otherHost.getHostInfo());
+		}
+		
+		
+		for (int i=0, n=connections.size(); i<n; i++) {
+			Connection con = connections.get(i);
+			Message started = tryAllMessages(con, messages); 
+			if (started != null) { 
+				
+				DTNHost msgDestination = started.getTo();
+				String msgDestinationName = msgDestination.toString();
+				
+				DTNHost selectedNeighbour = con.getOtherNode(this.getHost());
+				String selectedNeighbourName = selectedNeighbour.toString();
+				
+				String timeSinceSimulation = String.valueOf(System.currentTimeMillis() - DTNSim.startTimeOfSimulation);
+				
+				String key = hostName + "-" + msgDestinationName + "-" + neighbourNames +  "-"  + started.getId() + "-" + selectedNeighbourName + "-" + timeSinceSimulation ;
+				System.out.println(key);
+				
+				
+				FilePrinter.printToFileEventData(key, hostName, msgDestinationName, neighbourNames, started.getId(), selectedNeighbourName);
+				String _neighbourMetaData = getNeighbourMetaData(neighboursMetaData);
+				
+				FilePrinter.printToFileEventMetaData(
+													  key,
+													  currentHost.getHostInfo(),
+													  msgDestination.getHostInfo(),
+													  _neighbourMetaData,
+													  started.getId(),
+													  selectedNeighbourName
+												  );
+				return con;
+			}		
+		}
+		
+		return null;
+	}
+	
+	private String getNeighbourMetaData(ArrayList<String> neighboursMetaData) {
+		// TODO Auto-generated method stub
+		String _neighboursMetaData = "";
+		for(int i = 0; i < neighboursMetaData.size(); i++) {
+			_neighboursMetaData += neighboursMetaData.get(i)+",";
+		}
+		return _neighboursMetaData;
+	}
 	
 	@Override
 	public EpidemicRouter replicate() {
