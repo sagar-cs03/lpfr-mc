@@ -1,0 +1,16 @@
+message-status.csv = messageId, messageSize, msgSource, msgDestination, noOfHops, msgCreationTime, msgDeletionTime, listOfNodesTravelled(separated by -), delivery_type
+
+event_meta_data.csv = 
+              key{src-destination-neighbourNodes(separted by -)-messageId-selectedNeighbour-timeTransferred},
+              host_info_of_src{9 columns}, host_info_of_dest{9 columns}, host_info_of_each_neighbour{9 * noOfNeighbours},
+              msgId,
+              selectedneighbourName
+              
+              
+dataset_event.csv =
+                key{src-destination-neighbourNodes(separted by -)-messageId-selectedNeighbour-timeTransferred},
+                hostname, destination_name, neighbour_names{ numberofNeighbour times columns}, messageId, selectedNeighbour, delivered?
+             
+            
+              
+      
