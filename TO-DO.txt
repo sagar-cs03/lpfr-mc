@@ -1,0 +1,2 @@
+- When the final recipient is around the host, it will be delivered but that info is not present in dataset_event file,
+generate the event_row with selected_neighbour as the final_recipient
