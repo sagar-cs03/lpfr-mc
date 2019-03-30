@@ -281,9 +281,12 @@ public class EventLogPanel extends JPanel implements ConnectionListener, Message
 		if (!dropped) {
 			printToFile(where.getHostInfo(), ",,,,,,,,,,,", "removed");
 			processEvent(msgRemoveCheck, "Message removed", where, null, m);
+			FilePrinter.printToFileMessageStatusNotTransferred(MessageHelper.getMessageAttributes(m), MessageHelper.getPathTravelled(m.getHops()), "removed");
 		} else {
 			printToFile(where.getHostInfo(), ",,,,,,,,,,,", "deleted");
 			processEvent(msgDropCheck, "Message dropped", where, null, m);
+			FilePrinter.printToFileMessageStatusNotTransferred(MessageHelper.getMessageAttributes(m), MessageHelper.getPathTravelled(m.getHops()), "dropped");
+
 		}
 	}
 
@@ -298,8 +301,9 @@ public class EventLogPanel extends JPanel implements ConnectionListener, Message
 			processEvent(msgDeliveredCheck, "Message delivered again", from, to, m);
 		} else {
 			printToFile(to.getHostInfo(), to.getHostInfo(), "relayed");
-			FilePrinter.printToFileMessageStatus(MessageHelper.getMessageAttributes(m), MessageHelper.getPathTravelled(m.getHops()), "deliveredAgain");
+			//FilePrinter.printToFileMessageStatus(MessageHelper.getMessageAttributes(m), MessageHelper.getPathTravelled(m.getHops()), "relayed");
 			processEvent(msgRelayCheck, "Message relayed", from, to, m);
+			FilePrinter.printToFileMessageStatusRelayed(MessageHelper.getMessageAttributes(m), MessageHelper.getPathTravelled(m.getHops()), "transferStarted");
 		}
 	}
 
@@ -310,6 +314,7 @@ public class EventLogPanel extends JPanel implements ConnectionListener, Message
 	public void messageTransferAborted(Message m, DTNHost from, DTNHost to) {
 		printToFile(from.getHostInfo(), to.getHostInfo(), "transferAborted");
 		processEvent(msgAbortCheck, "Message relay aborted", from, to, m);
+		FilePrinter.printToFileMessageStatusNotTransferred(MessageHelper.getMessageAttributes(m), MessageHelper.getPathTravelled(m.getHops()), "deliveryAborted");
 	}
 
 	public void messageTransferStarted(Message m, DTNHost from, DTNHost to) {

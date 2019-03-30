@@ -58,7 +58,6 @@ public class FilePrinter {
 
 	//key - host-destination-neighbours-messageId-selectedNeighbour-time
 	//host, destination, max_10_neighbours, messageId, selectedNeighbour, finallyDelivered
-
 	public static void printToFileEventData(String key, String from, String to, String neighbours,
 			String messageId, String selectedNeighbour
 			) 
@@ -95,7 +94,43 @@ public class FilePrinter {
 			ioe.printStackTrace();
 		}
 	}
+	
+	//status - dropped, aborted
+	public static void printToFileMessageStatusNotTransferred(String messageId, String pathTravelled, String status) 
+	{
+		String tmp = messageId + ","+ pathTravelled + ","  + status + "\n";
+		try {
+			File file = new File ("C:\\Users\\i506670\\Projects\\lpfr-mc\\dataset\\message_status_aborted_dropped.csv");
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			FileWriter fw = new FileWriter (file, true);
+			BufferedWriter bw = new BufferedWriter (fw);
+			bw.write(tmp);
+			bw.close();
+		} catch (Exception ioe) {
+			ioe.printStackTrace();
+		}
+	}
 
+	//status - dropped, aborted
+	public static void printToFileMessageStatusRelayed(String messageId, String pathTravelled, String status) 
+	{
+		String tmp = messageId + ","+ pathTravelled + ","  + status + "\n";
+		try {
+			File file = new File ("C:\\Users\\i506670\\Projects\\lpfr-mc\\dataset\\message_status_relayed.csv");
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			FileWriter fw = new FileWriter (file, true);
+			BufferedWriter bw = new BufferedWriter (fw);
+			bw.write(tmp);
+			bw.close();
+		} catch (Exception ioe) {
+			ioe.printStackTrace();
+		}
+	}
+	
 	public static void printToFileEventDataForProphet(String key, String from, String to, String neighbours,
 			String messageId, String selectedNeighbour, String myPred, String othPred
 			) 

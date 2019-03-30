@@ -243,7 +243,8 @@ public class ProphetRouter extends ActiveRouter {
 				if (othRouter.hasMessage(m.getId())) {
 					continue; // skip messages that the other one has
 				}
-				if (othRouter.getPredFor(m.getTo()) > getPredFor(m.getTo())) {
+			
+				if (othRouter.getPredFor(m.getTo()) > getPredFor(m.getTo())) {	
 					
 					// the other node has higher probability of delivery
 					messages.add(new Tuple<Message, Connection>(m,con));
@@ -304,6 +305,7 @@ public class ProphetRouter extends ActiveRouter {
 												 selectedNeighbourName);
 			
 		}
+		
 		return msgWhoseTransferWasStartedToConnection;
 		
 	}

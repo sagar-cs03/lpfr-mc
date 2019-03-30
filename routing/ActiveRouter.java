@@ -488,6 +488,9 @@ public abstract class ActiveRouter extends MessageRouter {
 			tryMessagesForConnected(sortByQueueMode(getMessagesForConnected()));
 
 		if (t != null) {
+			
+			//TODO - Put this information to the dataset_events file
+			
 			return t.getValue(); // started transfer
 		}
 		
