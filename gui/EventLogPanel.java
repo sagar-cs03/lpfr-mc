@@ -301,7 +301,6 @@ public class EventLogPanel extends JPanel implements ConnectionListener, Message
 			processEvent(msgDeliveredCheck, "Message delivered again", from, to, m);
 		} else {
 			printToFile(to.getHostInfo(), to.getHostInfo(), "relayed");
-			//FilePrinter.printToFileMessageStatus(MessageHelper.getMessageAttributes(m), MessageHelper.getPathTravelled(m.getHops()), "relayed");
 			processEvent(msgRelayCheck, "Message relayed", from, to, m);
 			FilePrinter.printToFileMessageStatusRelayed(MessageHelper.getMessageAttributes(m), MessageHelper.getPathTravelled(m.getHops()), "transferStarted");
 		}

@@ -60,6 +60,8 @@ public class ProphetRouter extends ActiveRouter {
 	/** last delivery predictability update (sim)time */
 	private double lastAgeUpdate;
 	
+	private static final double PREDS_THRESHOLD = 0.015 + 0.01;
+	
 	/**
 	 * Constructor. Creates a new message router based on the settings in
 	 * the given Settings object.
@@ -246,8 +248,13 @@ public class ProphetRouter extends ActiveRouter {
 			
 				if (othRouter.getPredFor(m.getTo()) > getPredFor(m.getTo())) {	
 					
+					double otherPred = othRouter.getPredFor(m.getTo());
+					double myPred = getPredFor(m.getTo());
+					
+					if(Math.abs(otherPred - myPred) > PREDS_THRESHOLD ) {
 					// the other node has higher probability of delivery
-					messages.add(new Tuple<Message, Connection>(m,con));
+						messages.add(new Tuple<Message, Connection>(m,con));
+					}
 				}
 			}			
 		}
@@ -256,57 +263,57 @@ public class ProphetRouter extends ActiveRouter {
 			return null;
 		}
 		
-		//return tryMessagesForConnected(messages);	// try to send messages
+		return tryMessagesForConnected(messages);	// try to send messages
 		
-		Tuple<Message, Connection> msgWhoseTransferWasStartedToConnection = tryMessagesForConnected(messages);
-		if (msgWhoseTransferWasStartedToConnection != null) {
-			
-			Message msg = msgWhoseTransferWasStartedToConnection.getKey();
-			Connection con = msgWhoseTransferWasStartedToConnection.getValue();
-					
-			String hostName = this.getHost().toString();
-			
-			//message destination name
-			DTNHost msgDestination = msg.getTo();
-			String msgDestinationName = msgDestination.toString();
-			
-			//the selected router name
-			DTNHost selectedNeighbour = con.getOtherNode(this.getHost());
-			String selectedNeighbourName = selectedNeighbour.toString();
-			ProphetRouter selectedRouter = (ProphetRouter)selectedNeighbour.getRouter();
-			
-			//the time since simulation
-			//used in generating key
-			String timeSinceSimulation = String.valueOf(System.currentTimeMillis() - DTNSim.startTimeOfSimulation);
-			
-			//key - self explanatory
-			//extra - prob of this node, prob of the selected router node
-			String key = hostName + "-" + msgDestinationName + "-" + neighbourNames +  "-"  + msg.getId() + "-" + selectedNeighbourName + "-" + timeSinceSimulation ;
-			
-			//myRouter prediction and otherRouter prediction for the given msg
-			String myPrediction = "" + this.getPredFor(msg.getTo()), othRouterPrediction = "" + selectedRouter.getPredFor(msg.getTo());
-			
-
-			//key has extra probs
-			key += "-" + String.valueOf(this.getPredFor(msg.getTo())) + "-" + String.valueOf(selectedRouter.getPredFor(msg.getTo()));
-			
-			
-			
-			//print the info to the file
-			FilePrinter.printToFileEventDataForProphet(key, hostName, msgDestinationName, neighbourNames, msg.getId(), selectedNeighbourName, myPrediction, othRouterPrediction );
-			
-			String _neighbourMetaData = getNeighbourMetaData(neighboursMetaData);
-			
-			FilePrinter.printToFileEventMetaData(key,
-												 this.getHost().getHostInfo(), 
-												 msgDestination.getHostInfo(),
-												 _neighbourMetaData, 
-												 msg.getId(), 
-												 selectedNeighbourName);
-			
-		}
-		
-		return msgWhoseTransferWasStartedToConnection;
+//		Tuple<Message, Connection> msgWhoseTransferWasStartedToConnection = tryMessagesForConnected(messages);
+//		if (msgWhoseTransferWasStartedToConnection != null) {
+//			
+//			Message msg = msgWhoseTransferWasStartedToConnection.getKey();
+//			Connection con = msgWhoseTransferWasStartedToConnection.getValue();
+//					
+//			String hostName = this.getHost().toString();
+//			
+//			//message destination name
+//			DTNHost msgDestination = msg.getTo();
+//			String msgDestinationName = msgDestination.toString();
+//			
+//			//the selected router name
+//			DTNHost selectedNeighbour = con.getOtherNode(this.getHost());
+//			String selectedNeighbourName = selectedNeighbour.toString();
+//			ProphetRouter selectedRouter = (ProphetRouter)selectedNeighbour.getRouter();
+//			
+//			//the time since simulation
+//			//used in generating key
+//			String timeSinceSimulation = String.valueOf(System.currentTimeMillis() - DTNSim.startTimeOfSimulation);
+//			
+//			//key - self explanatory
+//			//extra - prob of this node, prob of the selected router node
+//			String key = hostName + "-" + msgDestinationName + "-" + neighbourNames +  "-"  + msg.getId() + "-" + selectedNeighbourName + "-" + timeSinceSimulation ;
+//			
+//			//myRouter prediction and otherRouter prediction for the given msg
+//			String myPrediction = "" + this.getPredFor(msg.getTo()), othRouterPrediction = "" + selectedRouter.getPredFor(msg.getTo());
+//			
+//
+//			//key has extra probs
+//			key += "-" + String.valueOf(this.getPredFor(msg.getTo())) + "-" + String.valueOf(selectedRouter.getPredFor(msg.getTo()));
+//			
+//			
+//			
+//			//print the info to the file
+//			FilePrinter.printToFileEventDataForProphet(key, hostName, msgDestinationName, neighbourNames, msg.getId(), selectedNeighbourName, myPrediction, othRouterPrediction );
+//			
+//			String _neighbourMetaData = getNeighbourMetaData(neighboursMetaData);
+//			
+//			FilePrinter.printToFileEventMetaData(key,
+//												 this.getHost().getHostInfo(), 
+//												 msgDestination.getHostInfo(),
+//												 _neighbourMetaData, 
+//												 msg.getId(), 
+//												 selectedNeighbourName);
+//			
+//		}
+//		
+//		return msgWhoseTransferWasStartedToConnection;
 		
 	}
 	

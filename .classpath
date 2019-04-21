@@ -8,7 +8,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/DTNConsoleConnection.jar"/>
 	<classpathentry kind="lib" path="lib/ECLA.jar"/>
-	<classpathentry kind="lib" path="C:/Users/i506670/Projects/lpfr-mc/javaee6-1.5.0.jar"/>
-	<classpathentry kind="lib" path="C:/Users/i506670/Projects/lpfr-mc/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="E:/Projects/lpfr-mc/junit-4.10.jar"/>
+	<classpathentry kind="lib" path="javaee6-1.5.0.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
